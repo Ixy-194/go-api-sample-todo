@@ -1,0 +1,33 @@
+version: '3'
+services:
+  go-app: # サービス名
+    container_name: app # コンテナ名
+    build: .  # ビルドに使う docker ファイルの場所
+    tty: true # コンテナの永続化
+    ports:
+      - 80:8080
+    volumes: 
+      - .:/go/src/app # マウントディレクトリ
+  mysql:
+      image: mysql:5.7
+      container_name: mysql
+      ports:
+        - 3306:3306
+      environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: docker
+          MYSQL_USER: docker
+          MYSQL_PASSWORD: docker
+          TZ: 'Asia/Tokyo'
+  phpadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: phpadmin
+      depends_on:
+          - mysql
+      environment:
+        - PMA_ARBITRARY=1
+        - PMA_HOSTS=mysql
+        - PMA_USER=docker
+        - PMA_PASSWORD=docker
+      ports:
+        - 3000:80
