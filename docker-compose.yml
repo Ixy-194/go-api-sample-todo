@@ -1,33 +1,32 @@
-version: '3'
+version: '3.4'
+
 services:
-  go-app: # サービス名
-    container_name: app # コンテナ名
-    build: .  # ビルドに使う docker ファイルの場所
-    tty: true # コンテナの永続化
+  app:
+    container_name: go-api-sample-todo
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - 80:8080
-    volumes: 
-      - .:/go/src/app # マウントディレクトリ
+    tty: true
+    volumes:
+      - .:/go/src/app
+    environment:
+      - DATABASE_HOST=mysql-db
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=todo-app
+      - DATABASE_USER=todo-app
+      - DATABASE_PASSWORD=todo-app
   mysql:
       image: mysql:5.7
-      container_name: mysql
+      container_name: mysql-db
       ports:
         - 3306:3306
+      volumes:
+        - ./migrations:/docker-entrypoint-initdb.d
       environment:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: docker
-          MYSQL_USER: docker
-          MYSQL_PASSWORD: docker
+          MYSQL_DATABASE: todo-app
+          MYSQL_USER: todo-app
+          MYSQL_PASSWORD: todo-app
           TZ: 'Asia/Tokyo'
-  phpadmin:
-      image: phpmyadmin/phpmyadmin
-      container_name: phpadmin
-      depends_on:
-          - mysql
-      environment:
-        - PMA_ARBITRARY=1
-        - PMA_HOSTS=mysql
-        - PMA_USER=docker
-        - PMA_PASSWORD=docker
-      ports:
-        - 3000:80
