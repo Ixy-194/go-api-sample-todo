@@ -111,14 +111,15 @@ func TestUpdate(t *testing.T) {
 
 	tests := []struct {
 		name             string
-		request          handler.UpdateRequestParam
+		requestPathParam handler.UpdateRequestPathParam
+		requestBodyParam handler.UpdateRequestBodyParam
 		usecase          usecase.Todo
 		want_status_code int
 	}{
 		{
-			name: "正常系_タスクの更新ができること",
-			request: handler.UpdateRequestParam{
-				ID:     1,
+			name:             "正常系_タスクの更新ができること",
+			requestPathParam: handler.UpdateRequestPathParam{1},
+			requestBodyParam: handler.UpdateRequestBodyParam{
 				Task:   "test",
 				Status: model.Created,
 			},
@@ -127,11 +128,11 @@ func TestUpdate(t *testing.T) {
 					return nil
 				},
 			},
-			want_status_code: http.StatusOK,
+			want_status_code: http.StatusNoContent,
 		},
 		{
 			name: "異常系_IDが指定されていなかった場合404エラーになること",
-			request: handler.UpdateRequestParam{
+			requestBodyParam: handler.UpdateRequestBodyParam{
 				Task:   "test",
 				Status: model.Created,
 			},
@@ -143,34 +144,34 @@ func TestUpdate(t *testing.T) {
 			want_status_code: http.StatusNotFound,
 		},
 		{
-			name: "異常系_必須項目がなかった場合バリデーションエラーになること（task）",
-			request: handler.UpdateRequestParam{
-				ID:     1,
+			name:             "異常系_必須項目がなかった場合バリデーションエラーになること（task）",
+			requestPathParam: handler.UpdateRequestPathParam{1},
+			requestBodyParam: handler.UpdateRequestBodyParam{
 				Status: model.Created,
 			},
 			want_status_code: http.StatusBadRequest,
 		},
 		{
-			name: "異常系_必須項目がなかった場合バリデーションエラーになること（status）",
-			request: handler.UpdateRequestParam{
-				ID:   1,
+			name:             "異常系_必須項目がなかった場合バリデーションエラーになること（status）",
+			requestPathParam: handler.UpdateRequestPathParam{1},
+			requestBodyParam: handler.UpdateRequestBodyParam{
 				Task: "task",
 			},
 			want_status_code: http.StatusBadRequest,
 		},
 		{
-			name: "異常系_ステータスに不正な値が指定された場合バリデーションエラーになること（status）",
-			request: handler.UpdateRequestParam{
-				ID:     1,
+			name:             "異常系_ステータスに不正な値が指定された場合バリデーションエラーになること（status）",
+			requestPathParam: handler.UpdateRequestPathParam{1},
+			requestBodyParam: handler.UpdateRequestBodyParam{
 				Task:   "task",
 				Status: "sss",
 			},
 			want_status_code: http.StatusBadRequest,
 		},
 		{
-			name: "異常系_タスクの更新に失敗した場合",
-			request: handler.UpdateRequestParam{
-				ID:     1,
+			name:             "異常系_タスクの更新に失敗した場合",
+			requestPathParam: handler.UpdateRequestPathParam{1},
+			requestBodyParam: handler.UpdateRequestBodyParam{
 				Task:   "test",
 				Status: model.Created,
 			},
@@ -187,7 +188,7 @@ func TestUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			h := handler.NewTodo(tt.usecase)
-			reqJSON, _ := json.Marshal(tt.request)
+			reqJSON, _ := json.Marshal(tt.requestBodyParam)
 
 			gin.SetMode(gin.TestMode)
 			r := gin.New()
@@ -195,8 +196,8 @@ func TestUpdate(t *testing.T) {
 
 			r.PUT("/:id", h.Update)
 			var id string
-			if tt.request.ID != 0 {
-				id = fmt.Sprintf("%d", tt.request.ID)
+			if tt.requestPathParam.ID != 0 {
+				id = fmt.Sprintf("%d", tt.requestPathParam.ID)
 			}
 			req := httptest.NewRequest("PUT", "/"+id, bytes.NewBuffer(reqJSON))
 			req.Header.Set("Content-Type", "application/json")
@@ -230,7 +231,7 @@ func TestDelete(t *testing.T) {
 					return nil
 				},
 			},
-			want_status_code: http.StatusOK,
+			want_status_code: http.StatusNoContent,
 		},
 		{
 			name:    "異常系_IDが指定されていなかった場合404エラーになること",

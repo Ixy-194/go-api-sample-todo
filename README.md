@@ -7,7 +7,7 @@ This is a simple RestAPI using gin and gorm.
 $ git clone https://github.com/Ixy-194/go-api-sample-todo.git
 $ cd go-api-sample-todo
 $ docker-compose up -d 
-$ docker exec -d go-api-sample-todo go run main.go
+$ docker exec -d go-api-sample-todo go run cmd/go-api-sample-todo/main.go
 ```
 ### Unit tests
 ```
@@ -20,7 +20,7 @@ $ go-api-sample-todo % docker exec go-api-sample-todo go test ./...
 | GET  | /todo  | Get all task list |
 | GET  | /todo/{id}  | Get a task |
 | POST  | /todo | Create a new task |
-| PUT  | /todo{id}  | Update a task |
+| PUT  | /todo/{id}  | Update a task |
 | DELETE  | /todo/{id}  | Delete a task |
 
 ### API call samples
@@ -35,10 +35,10 @@ $ curl -i -XGET localhost/todo/1
 $ curl -i localhost/todo -H "Content-Type: application/json" -X POST -d '{"task": "test1"}' 
 
 # Update a task
-$ curl -i localhost/todo/3 -H "Content-Type: application/json" -X PUT -d '{"task": "test1","status": "done"}'
+$ curl -i localhost/todo/1 -H "Content-Type: application/json" -X PUT -d '{"task": "test1","status": "done"}'
 
 # Delete a task
-$ curl -i localhost/todo/3 -X DELETE
+$ curl -i localhost/todo/1 -X DELETE
 
 ```
 ## Other

@@ -43,19 +43,28 @@ func (t *todoHandler) Create(c *gin.Context) {
 
 }
 
-type UpdateRequestParam struct {
-	ID     int              `uri:"id"`
+type UpdateRequestPathParam struct {
+	ID int `uri:"id"`
+}
+
+type UpdateRequestBodyParam struct {
 	Task   string           `json:"task" binding:"required,max=60"`
 	Status model.TaskStatus `json:"status" binding:"required,task_status"`
 }
 
 func (t *todoHandler) Update(c *gin.Context) {
-	var req UpdateRequestParam
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var pathParam UpdateRequestPathParam
+	var bodyParam UpdateRequestBodyParam
+
+	if err := c.ShouldBindUri(&pathParam); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := t.usecase.Update(req.ID, req.Task, req.Status); err != nil {
+	if err := c.ShouldBindJSON(&bodyParam); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := t.usecase.Update(pathParam.ID, bodyParam.Task, bodyParam.Status); err != nil {
 		c.JSON(http.StatusInternalServerError, "")
 		return
 	}
@@ -77,7 +86,7 @@ func (t *todoHandler) Delete(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusNoContent, nil)
 }
 
 type FindRequestParam struct {
