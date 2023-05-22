@@ -231,7 +231,7 @@ func TestDelete(t *testing.T) {
 					return nil
 				},
 			},
-			want_status_code: http.StatusOK,
+			want_status_code: http.StatusNoContent,
 		},
 		{
 			name:    "異常系_IDが指定されていなかった場合404エラーになること",
