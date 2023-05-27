@@ -11,7 +11,7 @@ $ docker exec -d go-api-sample-todo go run cmd/go-api-sample-todo/main.go
 ```
 ### Unit tests
 ```
-$ go-api-sample-todo % docker exec go-api-sample-todo go test ./... 
+$ docker exec go-api-sample-todo go test ./... 
 ```
 
 ### End points
